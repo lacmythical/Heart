@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Heart Stars</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heart Animation</title>
 
 <style>
     *{
@@ -14,51 +14,11 @@
 
     body{
         overflow:hidden;
-        background: radial-gradient(circle at bottom, #0b1020 0%, #000 100%);
-        font-family: Arial, sans-serif;
+        background:black;
     }
 
     canvas{
         display:block;
-    }
-
-    .text{
-        position:absolute;
-        top:50%;
-        left:50%;
-        transform:translate(-50%, -50%) scale(0.5);
-
-        color:white;
-        font-size:34px;
-        font-weight:bold;
-        text-align:center;
-        line-height:1.5;
-        letter-spacing:2px;
-
-        opacity:0;
-
-        transition:
-            opacity 2s,
-            transform 2s;
-
-        text-shadow:
-            0 0 10px white,
-            0 0 20px white,
-            0 0 40px white;
-
-        pointer-events:none;
-    }
-
-    .text.show{
-        opacity:1;
-        transform:translate(-50%, -50%) scale(1);
-    }
-
-    @media (max-width:600px){
-        .text{
-            font-size:22px;
-            width:90%;
-        }
     }
 </style>
 </head>
@@ -66,16 +26,9 @@
 
 <canvas id="canvas"></canvas>
 
-<div class="text" id="heartText">
-    Chúc cô bé của anh<br>
-    1/6 vui vẻ
-</div>
-
 <script>
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
-
-const text = document.getElementById("heartText");
 
 let w = canvas.width = window.innerWidth;
 let h = canvas.height = window.innerHeight;
@@ -83,112 +36,174 @@ let h = canvas.height = window.innerHeight;
 window.addEventListener("resize", () => {
     w = canvas.width = window.innerWidth;
     h = canvas.height = window.innerHeight;
-    createHeart();
 });
 
 const stars = [];
-const STAR_COUNT = 1000;
 
-function heartFunction(t){
+const STAR_COUNT = 1400;
 
-    const x = 16 * Math.pow(Math.sin(t), 3);
-
-    const y =
-        13 * Math.cos(t) -
-        5 * Math.cos(2 * t) -
-        2 * Math.cos(3 * t) -
-        Math.cos(4 * t);
-
-    return { x, y };
+function random(min,max){
+    return Math.random()*(max-min)+min;
 }
 
-function createHeart(){
+function heartPoint(t, scale){
+
+    const x = 16 * Math.pow(Math.sin(t),3);
+
+    const y =
+        13 * Math.cos(t)
+        - 5 * Math.cos(2*t)
+        - 2 * Math.cos(3*t)
+        - Math.cos(4*t);
+
+    return {
+        x: w/2 + x * scale,
+        y: h/2 - y * scale
+    };
+}
+
+function createStars(){
 
     stars.length = 0;
 
-    for(let i = 0; i < STAR_COUNT; i++){
-
-        const t = Math.random() * Math.PI * 2;
-        const heart = heartFunction(t);
-
-        const scale = Math.min(w, h) / 45;
-
-        const targetX = w / 2 + heart.x * scale;
-        const targetY = h / 2 - heart.y * scale;
+    for(let i=0;i<STAR_COUNT;i++){
 
         stars.push({
+            x: random(0,w),
+            y: random(0,h),
 
-            x: Math.random() * w,
-            y: Math.random() * h,
+            tx: random(0,w),
+            ty: random(0,h),
 
-            tx: targetX + (Math.random() - 0.5) * 12,
-            ty: targetY + (Math.random() - 0.5) * 12,
+            size: random(0.5,2),
 
-            size: Math.random() * 1.8 + 0.4,
+            speed: random(0.01,0.03),
 
-            // tốc độ tạo hình chậm hơn
-            speed: Math.random() * 0.006 + 0.002,
+            color: "255,255,255",
 
-            alpha: Math.random()
+            alpha: random(0.4,1)
         });
     }
 }
 
-createHeart();
+createStars();
 
-setTimeout(() => {
-    text.classList.add("show");
-}, 7000);
+function setHeart(color="255,255,255"){
 
-function drawBackgroundStars(){
+    stars.forEach(star => {
 
-    for(let i = 0; i < 80; i++){
+        const t = Math.random() * Math.PI * 2;
 
-        ctx.fillStyle = `rgba(255,255,255,${Math.random()})`;
-
-        ctx.beginPath();
-
-        ctx.arc(
-            Math.random() * w,
-            Math.random() * h,
-            Math.random() * 1.2,
-            0,
-            Math.PI * 2
+        const p = heartPoint(
+            t,
+            Math.min(w,h)/45
         );
 
-        ctx.fill();
+        star.tx = p.x + random(-8,8);
+        star.ty = p.y + random(-8,8);
+
+        star.color = color;
+    });
+}
+
+function scatter(){
+
+    stars.forEach(star => {
+
+        star.tx = random(0,w);
+        star.ty = random(0,h);
+    });
+}
+
+function setText(text){
+
+    const off = document.createElement("canvas");
+    const octx = off.getContext("2d");
+
+    off.width = w;
+    off.height = h;
+
+    const fontSize =
+        window.innerWidth < 600 ? 34 : 52;
+
+    octx.fillStyle = "white";
+    octx.textAlign = "center";
+    octx.textBaseline = "middle";
+    octx.font = `bold ${fontSize}px Arial`;
+
+    const lines = text.split("\n");
+
+    lines.forEach((line,index)=>{
+
+        octx.fillText(
+            line,
+            w/2,
+            h/2 + index*60
+        );
+    });
+
+    const data = octx.getImageData(
+        0,
+        0,
+        w,
+        h
+    ).data;
+
+    let points = [];
+
+    for(let y=0;y<h;y+=6){
+
+        for(let x=0;x<w;x+=6){
+
+            const index =
+                (y*w + x) * 4;
+
+            if(data[index+3] > 128){
+
+                points.push({x,y});
+            }
+        }
     }
+
+    stars.forEach((star,i)=>{
+
+        const p =
+            points[i % points.length];
+
+        star.tx = p.x;
+        star.ty = p.y;
+    });
 }
 
 function animate(){
 
     ctx.clearRect(0,0,w,h);
 
-    drawBackgroundStars();
-
     stars.forEach(star => {
 
-        star.x += (star.tx - star.x) * star.speed;
-        star.y += (star.ty - star.y) * star.speed;
+        star.x +=
+            (star.tx - star.x)
+            * star.speed;
 
-        star.alpha += (Math.random() - 0.5) * 0.03;
-
-        if(star.alpha < 0.3) star.alpha = 0.3;
-        if(star.alpha > 1) star.alpha = 1;
+        star.y +=
+            (star.ty - star.y)
+            * star.speed;
 
         ctx.beginPath();
 
-        ctx.fillStyle = `rgba(255,255,255,${star.alpha})`;
+        ctx.fillStyle =
+            `rgba(${star.color},${star.alpha})`;
 
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = "#fff";
+        ctx.shadowBlur = 10;
+        ctx.shadowColor =
+            `rgb(${star.color})`;
 
         ctx.arc(
             star.x,
             star.y,
             star.size,
             0,
-            Math.PI * 2
+            Math.PI*2
         );
 
         ctx.fill();
@@ -198,6 +213,37 @@ function animate(){
 }
 
 animate();
+
+
+// ===== TIMELINE =====
+
+// 1. tạo trái tim trắng
+setHeart("255,255,255");
+
+// 2. hiện text
+setTimeout(()=>{
+
+    setText(
+`Chúc cô bé của anh
+1/6 vui vẻ`
+    );
+
+},7000);
+
+// 3. tan ra
+setTimeout(()=>{
+
+    scatter();
+
+},14000);
+
+// 4. tụ lại thành tim hồng
+setTimeout(()=>{
+
+    setHeart("255,105,180");
+
+},19000);
+
 </script>
 
 </body>
