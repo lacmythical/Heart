@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Heart Animation</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
 
 <style>
 
@@ -15,14 +18,68 @@
 
 body{
     overflow:hidden;
+
     background:
-    radial-gradient(circle at bottom,
+    radial-gradient(
+    circle at bottom,
     #101530 0%,
     #000 100%);
+
+    font-family:
+    'Dancing Script',
+    cursive;
 }
 
 canvas{
     display:block;
+}
+
+
+/* ===== TEXT ===== */
+
+.message{
+
+    position:absolute;
+
+    top:50%;
+    left:50%;
+
+    transform:
+    translate(-50%,-50%)
+    scale(0.7);
+
+    color:white;
+
+    text-align:center;
+
+    line-height:1.5;
+
+    font-size:
+    clamp(32px,5vw,64px);
+
+    opacity:0;
+
+    transition:
+    opacity 4s ease,
+    transform 4s ease;
+
+    text-shadow:
+    0 0 10px rgba(255,255,255,0.8),
+    0 0 25px rgba(255,192,203,0.6),
+    0 0 45px rgba(255,105,180,0.5);
+
+    z-index:10;
+
+    pointer-events:none;
+}
+
+.message.show{
+
+    opacity:1;
+
+    transform:
+    translate(-50%,-50%)
+    scale(1);
 }
 
 </style>
@@ -31,6 +88,11 @@ canvas{
 
 <canvas id="canvas"></canvas>
 
+<div class="message" id="message">
+    Chúc cô bé của anh<br>
+    1/6 vui vẻ
+</div>
+
 <script>
 
 const canvas =
@@ -38,6 +100,9 @@ document.getElementById("canvas");
 
 const ctx =
 canvas.getContext("2d");
+
+const message =
+document.getElementById("message");
 
 let w =
 canvas.width =
@@ -49,7 +114,7 @@ window.innerHeight;
 
 window.addEventListener(
 "resize",
-() => {
+()=>{
 
     w =
     canvas.width =
@@ -193,107 +258,6 @@ function scatter(){
 }
 
 
-// ===== TEXT SHAPE =====
-
-function setText(text){
-
-    const off =
-    document.createElement(
-    "canvas"
-    );
-
-    const octx =
-    off.getContext("2d");
-
-    off.width = w;
-    off.height = h;
-
-    const fontSize =
-    window.innerWidth < 600
-    ? 30
-    : 52;
-
-    octx.fillStyle =
-    "white";
-
-    octx.textAlign =
-    "center";
-
-    octx.textBaseline =
-    "middle";
-
-    octx.font =
-    `bold ${fontSize}px Arial`;
-
-    const lines =
-    text.split("\n");
-
-    lines.forEach(
-    (line,index)=>{
-
-        octx.fillText(
-            line,
-            w/2,
-            h/2 + index*60
-        );
-    });
-
-    const data =
-    octx.getImageData(
-        0,
-        0,
-        w,
-        h
-    ).data;
-
-    let points = [];
-
-    for(
-        let y=0;
-        y<h;
-        y+=6
-    ){
-
-        for(
-            let x=0;
-            x<w;
-            x+=6
-        ){
-
-            const index =
-            (y*w + x)*4;
-
-            if(
-                data[index+3]
-                > 128
-            ){
-
-                points.push({
-                    x,
-                    y
-                });
-            }
-        }
-    }
-
-    stars.forEach(
-    (star,i)=>{
-
-        const p =
-        points[
-        i %
-        points.length
-        ];
-
-        star.tx = p.x;
-        star.ty = p.y;
-
-        star.color =
-        "255,255,255";
-    });
-}
-
-
 // ===== ANIMATION =====
 
 function animate(){
@@ -385,7 +349,7 @@ animate();
 // =======================
 
 // 0s
-// tụ thành trái tim trắng
+// tụ thành tim trắng
 
 setHeart(
 "255,255,255"
@@ -393,22 +357,25 @@ setHeart(
 
 
 // 20s
-// tụ thành chữ
+// hiện chữ overlay
 
 setTimeout(()=>{
 
-    setText(
-`Chúc cô bé của anh
-1/6 vui vẻ`
+    message.classList.add(
+    "show"
     );
 
 },20000);
 
 
 // 40s
-// tan ra
+// chữ biến mất + tan ra
 
 setTimeout(()=>{
+
+    message.classList.remove(
+    "show"
+    );
 
     scatter();
 
