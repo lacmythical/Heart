@@ -15,10 +15,50 @@
     body{
         overflow:hidden;
         background: radial-gradient(circle at bottom, #0b1020 0%, #000 100%);
+        font-family: Arial, sans-serif;
     }
 
     canvas{
         display:block;
+    }
+
+    .text{
+        position:absolute;
+        top:50%;
+        left:50%;
+        transform:translate(-50%, -50%) scale(0.5);
+
+        color:white;
+        font-size:34px;
+        font-weight:bold;
+        text-align:center;
+        line-height:1.5;
+        letter-spacing:2px;
+
+        opacity:0;
+
+        transition:
+            opacity 2s,
+            transform 2s;
+
+        text-shadow:
+            0 0 10px white,
+            0 0 20px white,
+            0 0 40px white;
+
+        pointer-events:none;
+    }
+
+    .text.show{
+        opacity:1;
+        transform:translate(-50%, -50%) scale(1);
+    }
+
+    @media (max-width:600px){
+        .text{
+            font-size:22px;
+            width:90%;
+        }
     }
 </style>
 </head>
@@ -26,9 +66,16 @@
 
 <canvas id="canvas"></canvas>
 
+<div class="text" id="heartText">
+    Chúc cô bé của anh<br>
+    1/6 vui vẻ
+</div>
+
 <script>
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+
+const text = document.getElementById("heartText");
 
 let w = canvas.width = window.innerWidth;
 let h = canvas.height = window.innerHeight;
@@ -40,10 +87,12 @@ window.addEventListener("resize", () => {
 });
 
 const stars = [];
-const STAR_COUNT = 1200;
+const STAR_COUNT = 1000;
 
 function heartFunction(t){
+
     const x = 16 * Math.pow(Math.sin(t), 3);
+
     const y =
         13 * Math.cos(t) -
         5 * Math.cos(2 * t) -
@@ -62,20 +111,23 @@ function createHeart(){
         const t = Math.random() * Math.PI * 2;
         const heart = heartFunction(t);
 
-        const scale = 18;
+        const scale = Math.min(w, h) / 45;
 
         const targetX = w / 2 + heart.x * scale;
         const targetY = h / 2 - heart.y * scale;
 
         stars.push({
+
             x: Math.random() * w,
             y: Math.random() * h,
 
-            tx: targetX + (Math.random() - 0.5) * 20,
-            ty: targetY + (Math.random() - 0.5) * 20,
+            tx: targetX + (Math.random() - 0.5) * 12,
+            ty: targetY + (Math.random() - 0.5) * 12,
 
-            size: Math.random() * 2 + 0.5,
-            speed: Math.random() * 0.03 + 0.015,
+            size: Math.random() * 1.8 + 0.4,
+
+            // tốc độ tạo hình chậm hơn
+            speed: Math.random() * 0.006 + 0.002,
 
             alpha: Math.random()
         });
@@ -84,18 +136,26 @@ function createHeart(){
 
 createHeart();
 
+setTimeout(() => {
+    text.classList.add("show");
+}, 7000);
+
 function drawBackgroundStars(){
 
-    for(let i = 0; i < 150; i++){
+    for(let i = 0; i < 80; i++){
+
         ctx.fillStyle = `rgba(255,255,255,${Math.random()})`;
+
         ctx.beginPath();
+
         ctx.arc(
             Math.random() * w,
             Math.random() * h,
-            Math.random() * 1.5,
+            Math.random() * 1.2,
             0,
             Math.PI * 2
         );
+
         ctx.fill();
     }
 }
@@ -111,14 +171,16 @@ function animate(){
         star.x += (star.tx - star.x) * star.speed;
         star.y += (star.ty - star.y) * star.speed;
 
-        star.alpha += (Math.random() - 0.5) * 0.05;
+        star.alpha += (Math.random() - 0.5) * 0.03;
 
         if(star.alpha < 0.3) star.alpha = 0.3;
         if(star.alpha > 1) star.alpha = 1;
 
         ctx.beginPath();
+
         ctx.fillStyle = `rgba(255,255,255,${star.alpha})`;
-        ctx.shadowBlur = 10;
+
+        ctx.shadowBlur = 8;
         ctx.shadowColor = "#fff";
 
         ctx.arc(
