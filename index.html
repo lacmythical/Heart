@@ -83,6 +83,50 @@ canvas{
 }
 
 
+/* ===== FINAL WORD ===== */
+
+.final-word{
+
+    position:absolute;
+
+    top:50%;
+    left:50%;
+
+    transform:
+    translate(-50%,-50%)
+    scale(0.5);
+
+    color:#ff69b4;
+
+    font-size:
+    clamp(60px,10vw,140px);
+
+    opacity:0;
+
+    transition:
+    opacity 2s ease,
+    transform 2s ease;
+
+    text-shadow:
+    0 0 20px rgba(255,105,180,0.9),
+    0 0 50px rgba(255,105,180,0.7),
+    0 0 90px rgba(255,255,255,0.5);
+
+    z-index:30;
+
+    pointer-events:none;
+}
+
+.final-word.show{
+
+    opacity:1;
+
+    transform:
+    translate(-50%,-50%)
+    scale(1);
+}
+
+
 /* ===== PHOTO ===== */
 
 .photo{
@@ -142,9 +186,10 @@ canvas{
 
 </div>
 
+<div class="final-word" id="finalWord"></div>
 
 <img
-src="https://i.postimg.cc/prLsrX2j/IMG-1963.jpg"
+src="https://i.postimg.cc/4ytM4Tj4/att-x6Lc-IT24G4Nohjw-HAfxa3ac-Af-Hlno-JA6S03-oes-Ob-V4.jpg"
 class="photo"
 id="photo"
 />
@@ -162,6 +207,9 @@ document.getElementById("message");
 
 const photo =
 document.getElementById("photo");
+
+const finalWord =
+document.getElementById("finalWord");
 
 let w =
 canvas.width =
@@ -470,6 +518,89 @@ setTimeout(()=>{
     );
 
 },40000);
+
+
+// 45s
+// ảnh biến mất
+
+setTimeout(()=>{
+
+    photo.classList.remove(
+    "show"
+    );
+
+},45000);
+
+
+// ===== WORDS =====
+
+// 47s
+// anh
+
+setTimeout(()=>{
+
+    finalWord.innerText =
+    "anh";
+
+    finalWord.classList.add(
+    "show"
+    );
+
+},47000);
+
+
+// 51s
+// ẩn anh
+
+setTimeout(()=>{
+
+    finalWord.classList.remove(
+    "show"
+    );
+
+},51000);
+
+
+// 53s
+// yêu
+
+setTimeout(()=>{
+
+    finalWord.innerText =
+    "yêu";
+
+    finalWord.classList.add(
+    "show"
+    );
+
+},53000);
+
+
+// 57s
+// ẩn yêu
+
+setTimeout(()=>{
+
+    finalWord.classList.remove(
+    "show"
+    );
+
+},57000);
+
+
+// 59s
+// em
+
+setTimeout(()=>{
+
+    finalWord.innerText =
+    "em";
+
+    finalWord.classList.add(
+    "show"
+    );
+
+},59000);
 
 </script>
 
